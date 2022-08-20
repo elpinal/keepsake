@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<head>
+  <title>Keepsake</title>
+  <style>
+    body {
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 1.5rem;
+      margin: 0 auto;
+      max-width: 70%;
+      line-height: 1.5;
+    }
+
+    .url-box {
+      width: 35rem;
+      height: 3rem;
+      font-size: 1.5rem;
+    }
+
+    .button {
+      height: 3rem;
+      font-size: 1.5rem;
+    }
+
+    .entry {
+      margin-top: 1.4rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .date {
+      float: right;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Keepsake</h1>
+
+  <form method="POST" action="/add">
+    <input class="url-box" type="text" name="url" placeholder="http://example.com" required>
+    <input class="button" type="submit" value="Add">
+  </form>
+
+  <ul>
+  {{ range . }}
+  <li class="entry">
+    <a href="{{.URL}}">{{.Title}}</a>
+    <time class="date">{{ .Date.Format "2006/01/02" }}</time>
+  </li>
+  {{ end }}
+  </ul>
+</body>
