@@ -3,6 +3,7 @@ package gettitle
 import (
 	"bufio"
 	"html"
+	"io"
 	"net/http"
 	"unicode/utf8"
 
@@ -11,7 +12,11 @@ import (
 
 func Get(logger log.Logger, r *bufio.Reader) (string, error) {
 	p := NewParser(logger, r)
-	return p.Parse()
+	s, err := p.Parse()
+	if err == io.EOF {
+		return "", nil
+	}
+	return s, err
 }
 
 func FromURL(logger log.Logger, url string) (string, error) {
