@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"time"
@@ -14,6 +15,8 @@ type Storage interface {
 	Add(url string, title string, date time.Time) error
 	List(limit int, offset int) ([]entry.Entry, error)
 	Count() (int, error)
+	Export(enc *json.Encoder, limit int, offset int) error
+	Import(dec *json.Decoder) error
 }
 
 type Server struct {
@@ -90,4 +93,51 @@ func (s *Add) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	end := time.Now()
 	s.logger.LogInfo("duration", end.Sub(start).String())
+}
+
+type Export Server
+
+func (s *Export) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	start := time.Now()
+	s.logger.LogInfo("/export", nil)
+
+	enc := json.NewEncoder(w)
+	err := s.storage.Export(enc, 1000, 0) // TODO
+	if err != nil {
+		s.logger.LogError("storage.Export", err.Error())
+	}
+
+	end := time.Now()
+	s.logger.LogInfo("/export: duration", end.Sub(start).String())
+}
+
+type Import Server
+
+func (s *Import) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	start := time.Now()
+	s.logger.LogInfo("/import", nil)
+
+	if req.Method != http.MethodPost {
+		s.logger.LogInfo("/import: not POST", req.Method)
+		http.Redirect(w, req, "/", http.StatusSeeOther)
+		return
+	}
+
+	f, header, err := req.FormFile("input")
+	if err != nil {
+		s.logger.LogError("FormFile", err.Error())
+	}
+	s.logger.LogInfo("/import: header", header)
+
+	dec := json.NewDecoder(f)
+	err = s.storage.Import(dec)
+	if err != nil {
+		s.logger.LogError("storage.Import", err.Error())
+	}
+
+	s.logger.LogInfo("/import: redirecting to /", nil)
+	http.Redirect(w, req, "/", http.StatusSeeOther)
+
+	end := time.Now()
+	s.logger.LogInfo("/import: duration", end.Sub(start).String())
 }

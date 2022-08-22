@@ -31,6 +31,8 @@ func run() error {
 	s := server.NewServer(logger, storage)
 	http.Handle("/", s)
 	http.Handle("/add", (*server.Add)(s))
+	http.Handle("/export", (*server.Export)(s))
+	http.Handle("/import", (*server.Import)(s))
 
 	logger.LogInfo("Listening on port...", port)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)

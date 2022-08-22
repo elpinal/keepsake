@@ -2,4 +2,4 @@
 
 ## TODO
 
-- Export to JSON / Import from JSON
+- Deletion.

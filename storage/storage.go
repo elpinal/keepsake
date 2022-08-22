@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -91,4 +92,61 @@ func (db *SQLite3Storage) Count() (int, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func (db *SQLite3Storage) Export(enc *json.Encoder, limit int, offset int) error {
+	db.logger.LogInfo("sqlite3: select", map[string]int{"limit": limit, "offset": offset})
+	rows, err := db.Query(
+		`SELECT url, title, date FROM entries ORDER BY id ASC LIMIT ?, ?`,
+		offset,
+		limit,
+	)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			url   string
+			title string
+			date  time.Time
+		)
+		if err := rows.Scan(&url, &title, &date); err != nil {
+			return err
+		}
+		err = enc.Encode(entry.Entry{URL: url, Title: title, Date: date})
+		if err != nil {
+			return err
+		}
+	}
+
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *SQLite3Storage) Import(dec *json.Decoder) error {
+	// TODO: timeout or something?
+
+	stmt, err := db.Prepare(`INSERT INTO entries (url, title, date) VALUES (?, ?, ?)`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for dec.More() {
+		var entry entry.Entry
+		if err := dec.Decode(&entry); err != nil {
+			return err
+		}
+		db.logger.LogInfo("importing an entry", entry)
+		_, err = stmt.Exec(entry.URL, entry.Title, entry.Date)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -38,6 +38,11 @@
       list-style-type: none;
       padding-left: 0;
     }
+
+    .export {
+      color: rgb(102, 186, 42);
+      float: right;
+    }
   </style>
 </head>
 
@@ -47,6 +52,13 @@
   <form method="POST" action="/add">
     <input class="url-box" type="text" name="url" placeholder="http://example.com" required>
     <input class="button" type="submit" value="Add">
+  </form>
+
+  <a href="/export" class="export">Export</a>
+
+  <form method="POST" action="/import" enctype="multipart/form-data">
+    <input type="file" accept="application/json" name="input" required>
+    <input class="button" type="submit" value="Import">
   </form>
 
   <ul>
