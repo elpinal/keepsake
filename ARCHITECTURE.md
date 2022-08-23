@@ -14,8 +14,8 @@ To get the title of a web page, we use a simple heuristic algorithm in this pack
 ### `log/`
 
 We define a package called `log`, other than the `log` package in the Go
-standard library, because we want to use log levels and emit logs as a JSON
-object.
+standard library, because we want to use log levels and emit logs as JSON
+objects.
 
 ### `resources/`
 
