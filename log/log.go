@@ -8,16 +8,16 @@ import (
 	"time"
 )
 
-type LogLevel int
+type Level int
 
 const (
-	Debug LogLevel = iota
+	Debug Level = iota
 	Info
 	Warn
 	Error
 )
 
-func (l LogLevel) String() string {
+func (l Level) String() string {
 	switch l {
 	case Debug:
 		return "DEBUG"
@@ -32,18 +32,18 @@ func (l LogLevel) String() string {
 	}
 }
 
-type LogLevelValue struct {
-	Level LogLevel
+type LevelValue struct {
+	Level Level
 }
 
-func (p *LogLevelValue) String() string {
+func (p *LevelValue) String() string {
 	if p != nil {
 		return p.Level.String()
 	}
 	return ""
 }
 
-func (p *LogLevelValue) Set(s string) error {
+func (p *LevelValue) Set(s string) error {
 	switch strings.ToLower(s) {
 	case "debug":
 		p.Level = Debug
@@ -60,7 +60,7 @@ func (p *LogLevelValue) Set(s string) error {
 	return nil
 }
 
-func (l LogLevel) MarshalJSON() ([]byte, error) {
+func (l Level) MarshalJSON() ([]byte, error) {
 	bs := []byte{'"'}
 	bs = append(bs, l.String()...)
 	bs = append(bs, '"')
@@ -68,11 +68,11 @@ func (l LogLevel) MarshalJSON() ([]byte, error) {
 }
 
 type Logger struct {
-	level LogLevel
+	level Level
 	out   io.Writer
 }
 
-func NewLogger(w io.Writer, level LogLevel) Logger {
+func NewLogger(w io.Writer, level Level) Logger {
 	return Logger{
 		level: level,
 		out:   w,
@@ -81,12 +81,12 @@ func NewLogger(w io.Writer, level LogLevel) Logger {
 
 type Output struct {
 	Date    time.Time
-	Level   LogLevel
+	Level   Level
 	Message string
 	Value   any
 }
 
-func (l Logger) Log(level LogLevel, msg string, v any) {
+func (l Logger) Log(level Level, msg string, v any) {
 	if l.level > level {
 		return
 	}

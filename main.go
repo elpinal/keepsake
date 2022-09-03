@@ -14,7 +14,7 @@ import (
 var (
 	port     = flag.Int("port", 7800, "http port")
 	dev      = flag.Bool("dev", false, "dev mode")
-	logLevel = &log.LogLevelValue{Level: log.Info}
+	logLevel = &log.LevelValue{Level: log.Info}
 )
 
 func main() {
