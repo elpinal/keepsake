@@ -25,11 +25,11 @@ type Server struct {
 	dev     bool
 }
 
-func NewServer(logger log.Logger, storage Storage) *Server {
+func NewServer(logger log.Logger, storage Storage, dev bool) *Server {
 	return &Server{
 		logger:  logger,
 		storage: storage,
-		dev:     true, // TODO: inherit from CLI options.
+		dev:     dev,
 	}
 }
 

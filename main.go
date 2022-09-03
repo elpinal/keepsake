@@ -13,6 +13,7 @@ import (
 
 var (
 	port = flag.Int("port", 7800, "http port")
+	dev = flag.Bool("dev", false, "dev mode")
 )
 
 func main() {
@@ -33,7 +34,8 @@ func run() error {
 	}
 	defer storage.Close()
 
-	s := server.NewServer(logger, storage)
+	logger.LogInfo("dev mode", *dev)
+	s := server.NewServer(logger, storage, *dev)
 	http.Handle("/", s)
 	http.Handle("/add", (*server.Add)(s))
 	http.Handle("/export", (*server.Export)(s))
