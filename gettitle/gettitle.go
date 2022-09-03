@@ -5,6 +5,7 @@ import (
 	"html"
 	"io"
 	"net/http"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/elpinal/keepsake/log"
@@ -68,7 +69,7 @@ func (p *Parser) Parse() (string, error) {
 
 		p.logPeek(1)
 
-		found, err := p.exact("title")
+		found, err := p.exactLower("title")
 		if err != nil {
 			return "", err
 		}
@@ -128,14 +129,16 @@ func (p *Parser) skipWhitespace() error {
 	}
 }
 
-func (p *Parser) exact(s string) (bool, error) {
+func (p *Parser) exactLower(s string) (bool, error) {
 	var notFound bool
+
 	bs := make([]byte, len(s))
 	_, err := p.Read(bs)
 	if err != nil {
 		return notFound, err
 	}
-	s1 := string(bs)
+
+	s1 := strings.ToLower(string(bs))
 	if s == s1 {
 		return true, nil
 	}

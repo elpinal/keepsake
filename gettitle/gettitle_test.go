@@ -40,3 +40,19 @@ func TestGetEscape(t *testing.T) {
 		t.Logf("log: %s", buf.String())
 	}
 }
+
+func TestGetCapital(t *testing.T) {
+	var buf bytes.Buffer
+	logger := log.NewLogger(&buf, log.Debug)
+	r := bufio.NewReader(strings.NewReader("<TITLE>equational theory</TITLE>"))
+
+	s, err := Get(logger, r)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+
+	if expetced := `equational theory`; s != expetced {
+		t.Errorf("expected %q, but got %q", expetced, s)
+		t.Logf("log: %s", buf.String())
+	}
+}
