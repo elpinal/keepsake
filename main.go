@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,9 +11,13 @@ import (
 	"github.com/elpinal/keepsake/storage"
 )
 
-var port int = 7800
+var (
+	port = flag.Int("port", 7800, "http port")
+)
 
 func main() {
+	flag.Parse()
+
 	err := run()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -34,8 +39,8 @@ func run() error {
 	http.Handle("/export", (*server.Export)(s))
 	http.Handle("/import", (*server.Import)(s))
 
-	logger.LogInfo("Listening on port...", port)
-	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	logger.LogInfo("Listening on port...", *port)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
 
 	return err
 }
