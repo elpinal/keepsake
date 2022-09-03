@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -29,6 +30,34 @@ func (l LogLevel) String() string {
 	default:
 		return "UNKNOWN"
 	}
+}
+
+type LogLevelValue struct {
+	Level LogLevel
+}
+
+func (p *LogLevelValue) String() string {
+	if p != nil {
+		return p.Level.String()
+	}
+	return ""
+}
+
+func (p *LogLevelValue) Set(s string) error {
+	switch strings.ToLower(s) {
+	case "debug":
+		p.Level = Debug
+	case "info":
+		p.Level = Info
+	case "warn":
+		p.Level = Warn
+	case "error":
+		p.Level = Error
+	default:
+		return fmt.Errorf("unknown log level: %q", s)
+	}
+
+	return nil
 }
 
 func (l LogLevel) MarshalJSON() ([]byte, error) {

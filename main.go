@@ -12,11 +12,13 @@ import (
 )
 
 var (
-	port = flag.Int("port", 7800, "http port")
-	dev = flag.Bool("dev", false, "dev mode")
+	port     = flag.Int("port", 7800, "http port")
+	dev      = flag.Bool("dev", false, "dev mode")
+	logLevel = &log.LogLevelValue{Level: log.Info}
 )
 
 func main() {
+	flag.Var(logLevel, "loglevel", "log level")
 	flag.Parse()
 
 	err := run()
@@ -26,7 +28,7 @@ func main() {
 }
 
 func run() error {
-	logger := log.NewLogger(os.Stdout, log.Debug)
+	logger := log.NewLogger(os.Stdout, logLevel.Level)
 
 	storage, err := storage.New(logger, "entries.db")
 	if err != nil {
