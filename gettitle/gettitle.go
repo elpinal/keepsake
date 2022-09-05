@@ -153,7 +153,9 @@ func (p *Parser) readTo(b byte) (string, error) {
 	bs = bs[:len(bs)-1]
 	s := string(bs)
 	if !utf8.ValidString(s) {
-		p.logger.LogWarn("not utf8 string", bs)
+		// TODO: support non-utf8 encodings.
+		p.logger.LogWarn("not utf8 string", s)
+		return "", nil
 	}
 	return html.UnescapeString(s), nil
 }
