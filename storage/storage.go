@@ -150,3 +150,32 @@ func (db *SQLite3Storage) Import(dec *json.Decoder) error {
 	}
 	return nil
 }
+
+func (db *SQLite3Storage) Search(q string) ([]entry.Entry, error) {
+	db.logger.LogInfo("sqlite3: query", q)
+	rows, err := db.Query(`SELECT url, title, date FROM entries WHERE title LIKE ? ORDER BY id DESC`, "%"+q+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	entries := make([]entry.Entry, 0)
+
+	for rows.Next() {
+		var (
+			url   string
+			title string
+			date  time.Time
+		)
+		if err := rows.Scan(&url, &title, &date); err != nil {
+			return nil, err
+		}
+		entries = append(entries, entry.Entry{URL: url, Title: title, Date: date})
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return entries, nil
+}

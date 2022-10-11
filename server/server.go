@@ -17,6 +17,7 @@ type Storage interface {
 	Count() (int, error)
 	Export(enc *json.Encoder, limit int, offset int) error
 	Import(dec *json.Decoder) error
+	Search(q string) ([]entry.Entry, error)
 }
 
 type Server struct {
@@ -141,3 +142,29 @@ func (s *Import) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	end := time.Now()
 	s.logger.LogInfo("/import: duration", end.Sub(start).String())
 }
+
+type Search Server
+
+func (s *Search) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	start := time.Now()
+	s.logger.LogInfo("/search", nil)
+
+	u := req.URL
+	q := u.Query()
+	query := q.Get("query")
+	// TODO: limit?
+	entries, err := s.storage.Search(query)
+	if err != nil {
+		s.logger.LogError("storage.Search", err.Error())
+	}
+	s.logger.LogDebug("/search: the number of matched entries", len(entries))
+
+	// TODO: need to updateTemplate?
+	err = tmpl.Execute(w, entries)
+	if err != nil {
+		s.logger.LogError("tmpl.Execute", err.Error())
+	}
+	end := time.Now()
+	s.logger.LogInfo("/search: duration", end.Sub(start).String())
+}
+
